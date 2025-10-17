@@ -15,7 +15,6 @@ export function parseSingleCarInput(input: string): {
   const lines = input
     .trim()
     .split('\n')
-    .map((line) => line.trim())
     .filter((line) => line.length > 0);
 
   if (lines.length < 3) {
@@ -44,7 +43,6 @@ export function parseMultiCarInput(input: string): {
   const lines = input
     .trim()
     .split('\n')
-    .map((line) => line.trim())
     .filter((line) => line.length > 0);
 
   if (lines.length < 4) {

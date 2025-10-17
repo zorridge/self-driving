@@ -146,7 +146,7 @@ function multiCarInput(
   ].join('\n');
 }
 
-// --- Named constants for common test cases ---
+// --- Constants for common test cases ---
 
 const validSingleInput = singleCarInput();
 const invalidFieldInput = singleCarInput({ field: '0 5' });
@@ -161,7 +161,7 @@ const validMultiInput = multiCarInput([
 ]);
 const tooFewLinesMultiInput = '5 5\nA\n1 2 N';
 const emptyIdMultiInput = multiCarInput([
-  { id: '', position: '1 2 N', commands: 'LFRF' },
+  { id: ' ', position: '1 2 N', commands: 'LFRF' },
   { id: 'B', position: '3 3 E', commands: 'FFL' },
 ]);
 const incompleteCarMultiInput = [

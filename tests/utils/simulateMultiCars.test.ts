@@ -106,6 +106,8 @@ describe('simulateMultiCar', () => {
   });
 });
 
+// --- Helper functions for input construction ---
+
 function multiCarInput(
   cars: Array<{ id: string; position: string; commands: string }>,
   field = '5 5',

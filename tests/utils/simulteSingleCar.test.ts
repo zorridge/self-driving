@@ -56,6 +56,8 @@ describe('simulateSingleCar', () => {
   });
 });
 
+// --- Helper functions for input construction ---
+
 function singleCarInput({
   field = '5 5',
   position = '1 2 N',
