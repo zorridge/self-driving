@@ -1,13 +1,16 @@
-import { parseInput } from './parser';
+import { parseSingleCarInput } from './parser';
 
 export function simulateSingleCar(input: string): string {
   let parsed;
   try {
-    parsed = parseInput(input);
+    parsed = parseSingleCarInput(input);
   } catch (err) {
     return `Input error: ${(err as Error).message}`;
   }
-  const { field, car, commands } = parsed;
+  const {
+    field,
+    car: { car, commands },
+  } = parsed;
 
   for (const cmd of commands) {
     if (cmd === 'L' || cmd === 'R') {
