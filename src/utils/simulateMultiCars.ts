@@ -1,10 +1,11 @@
 import { Car } from '../entities/Car';
+import { Command } from '../types';
 import { parseMultiCarInput } from './parser';
 
 interface CarState {
   id: string;
   car: Car;
-  commands: string[];
+  commands: Command[];
   commandIndex: number;
 }
 
@@ -20,6 +21,7 @@ export function simulateMultiCar(input: string): string {
   } catch (err) {
     return `Input error: ${(err as Error).message}`;
   }
+
   const { field, cars } = parsed;
 
   // Setup initial states
@@ -37,24 +39,20 @@ export function simulateMultiCar(input: string): string {
   const maxSteps = Math.max(...states.map((s) => s.commands.length));
 
   while (step < maxSteps && !collision) {
-    // Determine intended moves
+    // Determine intended moves for this step
     const intendedPositions: Map<string, { x: number; y: number }> = new Map();
     const positionToIds: Map<string, string[]> = new Map();
 
-    // First, compute each car's intended position
     for (const state of states) {
-      let intended = { ...state.car.position };
-      if (state.commandIndex < state.commands.length) {
-        const cmd = state.commands[state.commandIndex];
-        if (cmd === 'L' || cmd === 'R') {
-          // Rotation doesn't change position
-        } else if (cmd === 'F') {
-          const nextPos = state.car.getNextPosition();
-          if (field.isWithinBounds(nextPos)) {
-            intended = nextPos;
-          }
-        }
-      }
+      const cmd =
+        state.commandIndex < state.commands.length
+          ? state.commands[state.commandIndex]
+          : null;
+
+      const intended = cmd
+        ? state.car.getIntendedPosition(cmd, field)
+        : state.car.position;
+
       intendedPositions.set(state.id, intended);
 
       const posKey = `${intended.x},${intended.y}`;
@@ -77,12 +75,7 @@ export function simulateMultiCar(input: string): string {
     for (const state of states) {
       if (state.commandIndex < state.commands.length) {
         const cmd = state.commands[state.commandIndex];
-        if (cmd === 'L' || cmd === 'R') {
-          state.car.rotate(cmd as 'L' | 'R');
-        } else if (cmd === 'F') {
-          state.car.moveForward(field);
-        }
-        // Ignore invalid commands
+        state.car.executeCommand(cmd, field);
       }
       state.commandIndex += 1;
     }
@@ -93,13 +86,11 @@ export function simulateMultiCar(input: string): string {
   if (collision) {
     // Output: IDs, position, step (1-based)
     return (
-      `${collision.ids.join(' ')}` +
-      '\n' +
-      `${collision.position.x} ${collision.position.y}` +
-      '\n' +
+      `${collision.ids.join(' ')}\n` +
+      `${collision.position.x} ${collision.position.y}\n` +
       `${step + 1}`
     );
   } else {
-    return 'No collision';
+    return 'no collision';
   }
 }
