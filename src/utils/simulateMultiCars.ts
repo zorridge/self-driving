@@ -1,5 +1,5 @@
 import { Car } from '../entities/Car';
-import { Command } from '../types';
+import { Command, Position } from '../types';
 import { parseMultiCarInput } from './parser';
 
 interface CarState {
@@ -11,8 +11,8 @@ interface CarState {
 
 type CollisionState = {
   ids: string[];
-  position: { x: number; y: number };
-} | null;
+  position: Position;
+};
 
 export function simulateMultiCar(input: string): string {
   let parsed;
@@ -32,15 +32,15 @@ export function simulateMultiCar(input: string): string {
     commandIndex: 0,
   }));
 
-  let step = 0;
-  let collision: CollisionState = null;
-
   // Find the longest command list
   const maxSteps = Math.max(...states.map((s) => s.commands.length));
+  let step = 0;
 
-  while (step < maxSteps && !collision) {
+  while (step < maxSteps) {
+    const collisions: CollisionState[] = [];
+
     // Determine intended moves for this step
-    const intendedPositions: Map<string, { x: number; y: number }> = new Map();
+    const intendedPositions: Map<string, Position> = new Map();
     const positionToIds: Map<string, string[]> = new Map();
 
     for (const state of states) {
@@ -64,12 +64,22 @@ export function simulateMultiCar(input: string): string {
     for (const [posKey, ids] of positionToIds.entries()) {
       if (ids.length > 1) {
         const [x, y] = posKey.split(',').map(Number);
-        collision = { ids, position: { x, y } };
-        break;
+        collisions.push({ ids, position: { x, y } });
       }
     }
 
-    if (collision) break;
+    if (collisions.length > 0) {
+      return collisions
+        .map(
+          (col) =>
+            `${col.ids.join(' ')}` +
+            '\n' +
+            `${col.position.x} ${col.position.y}` +
+            '\n' +
+            `${step + 1}`,
+        )
+        .join('\n---\n');
+    }
 
     // No collision: execute moves
     for (const state of states) {
@@ -83,14 +93,5 @@ export function simulateMultiCar(input: string): string {
     step += 1;
   }
 
-  if (collision) {
-    // Output: IDs, position, step (1-based)
-    return (
-      `${collision.ids.join(' ')}\n` +
-      `${collision.position.x} ${collision.position.y}\n` +
-      `${step + 1}`
-    );
-  } else {
-    return 'no collision';
-  }
+  return 'no collision';
 }

@@ -1,6 +1,6 @@
 import { Field } from '../entities/Field';
 import { Car } from '../entities/Car';
-import { Command, Direction } from '../types';
+import { Command, Direction, Position } from '../types';
 
 export interface CarInput {
   id: string;
@@ -13,45 +13,20 @@ export function parseSingleCarInput(input: string): {
   car: CarInput;
 } {
   const lines = input.trim().split('\n');
-
   if (lines.length < 3) {
     throw new Error(
       'Input must have at least 3 lines: field size, car position/direction, commands.',
     );
   }
 
-  // Parse field size
-  const [widthStr, heightStr] = lines[0].split(' ');
-  const width = Number(widthStr);
-  const height = Number(heightStr);
-  if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
-    throw new Error(
-      'Invalid field size. Width and height must be positive integers.',
-    );
-  }
-
-  // Parse car position and direction
-  const [xStr, yStr, dirStr] = lines[1].split(' ');
-  const x = Number(xStr);
-  const y = Number(yStr);
-  if (isNaN(x) || isNaN(y) || x < 0 || y < 0 || x >= width || y >= height) {
-    throw new Error(
-      'Invalid car position. Position must be within field bounds.',
-    );
-  }
-  if (!['N', 'E', 'S', 'W'].includes(dirStr)) {
-    throw new Error('Invalid car direction. Must be N, E, S, or W.');
-  }
-
-  // Parse commands
-  const commands = parseCommands(lines[2]);
-  console.log(commands);
-
+  const field = _parseField(lines[0]);
+  const { position, direction } = _parseCarPosition(lines[1], field);
+  const commands = _parseCommands(lines[2]);
   return {
-    field: new Field(width, height),
+    field,
     car: {
       id: '0',
-      car: new Car({ x, y }, dirStr as Direction),
+      car: new Car(position, direction),
       commands,
     },
   };
@@ -67,43 +42,20 @@ export function parseMultiCarInput(input: string): {
       'Input must have at least 4 lines for multi-car simulation.',
     );
   }
-
-  // Parse field size
-  const [widthStr, heightStr] = lines[0].split(' ');
-  const width = Number(widthStr);
-  const height = Number(heightStr);
-  if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
-    throw new Error(
-      'Invalid field size. Width and height must be positive integers.',
-    );
-  }
-
-  // Parse cars
+  const field = _parseField(lines[0]);
   const cars: CarInput[] = [];
+
   let i = 1;
   while (i < lines.length) {
     const id = lines[i].trim();
     if (!id) throw new Error('Car ID cannot be empty.');
-
     if (i + 2 >= lines.length) throw new Error('Incomplete car definition.');
 
-    // Parse car position and direction
-    const [xStr, yStr, dirStr] = lines[i + 1].split(' ');
-    const x = Number(xStr);
-    const y = Number(yStr);
-    if (isNaN(x) || isNaN(y) || x < 0 || y < 0 || x >= width || y >= height) {
-      throw new Error(`Invalid car position for car ${id}.`);
-    }
-    if (!['N', 'E', 'S', 'W'].includes(dirStr)) {
-      throw new Error(`Invalid direction for car ${id}.`);
-    }
-
-    // Parse commands
-    const commands = parseCommands(lines[i + 2]);
-
+    const { position, direction } = _parseCarPosition(lines[i + 1], field);
+    const commands = _parseCommands(lines[i + 2]);
     cars.push({
       id,
-      car: new Car({ x, y }, dirStr as Direction),
+      car: new Car(position, direction),
       commands,
     });
 
@@ -123,12 +75,54 @@ export function parseMultiCarInput(input: string): {
   }
 
   return {
-    field: new Field(width, height),
+    field,
     cars,
   };
 }
 
-function parseCommands(cmdStr: string): Command[] {
+function _parseField(line: string): Field {
+  const [widthStr, heightStr] = line.split(' ');
+  const width = Number(widthStr);
+  const height = Number(heightStr);
+
+  if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
+    throw new Error(
+      'Invalid field size. Width and height must be positive integers.',
+    );
+  }
+
+  return new Field(width, height);
+}
+
+function _parseCarPosition(
+  line: string,
+  field: Field,
+): { position: Position; direction: Direction } {
+  const [xStr, yStr, dirStr] = line.split(' ');
+  const x = Number(xStr);
+  const y = Number(yStr);
+
+  if (
+    isNaN(x) ||
+    isNaN(y) ||
+    x < 0 ||
+    y < 0 ||
+    x >= field.width ||
+    y >= field.height
+  ) {
+    throw new Error(
+      'Invalid car position. Position must be within field bounds.',
+    );
+  }
+
+  if (!Object.values(Direction).includes(dirStr as Direction)) {
+    throw new Error('Invalid car direction. Must be N, E, S, or W.');
+  }
+
+  return { position: { x, y }, direction: dirStr as Direction };
+}
+
+function _parseCommands(cmdStr: string): Command[] {
   return cmdStr.split('').map((char) => {
     switch (char) {
       case 'L':
