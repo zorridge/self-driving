@@ -32,7 +32,7 @@ describe('parseSingleCarInput', () => {
     );
   });
 
-  it('throws on car out of bounds', () => {
+  it('throws on invalid car position', () => {
     expect(() => parseSingleCarInput(invalidPositionInput)).toThrow(
       'Invalid car position. Position must be within field bounds.',
     );
@@ -83,6 +83,24 @@ describe('parseMultiCarInput', () => {
     );
   });
 
+  it('throws on invalid car position', () => {
+    expect(() => parseMultiCarInput(invalidCarPositionMultiInput)).toThrow(
+      'Invalid car position. Position must be within field bounds.',
+    );
+  });
+
+  it('throws on invalid direction', () => {
+    expect(() => parseMultiCarInput(invalidDirectionMultiInput)).toThrow(
+      'Invalid car direction. Must be N, E, S, or W.',
+    );
+  });
+
+  it('throws on invalid command character', () => {
+    expect(() => parseMultiCarInput(invalidCommandMultiInput)).toThrow(
+      'Invalid command character: X',
+    );
+  });
+
   it('throws on empty car ID', () => {
     expect(() => parseMultiCarInput(emptyIdMultiInput)).toThrow(
       'Car ID cannot be empty.',
@@ -104,24 +122,6 @@ describe('parseMultiCarInput', () => {
   it('throws on car position collision', () => {
     expect(() => parseMultiCarInput(positionCollisionMultiInput)).toThrow(
       'Two cars cannot start at the same position.',
-    );
-  });
-
-  it('throws on invalid car position', () => {
-    expect(() => parseMultiCarInput(invalidCarPositionMultiInput)).toThrow(
-      'Invalid car position. Position must be within field bounds.',
-    );
-  });
-
-  it('throws on invalid direction', () => {
-    expect(() => parseMultiCarInput(invalidDirectionMultiInput)).toThrow(
-      'Invalid car direction. Must be N, E, S, or W.',
-    );
-  });
-
-  it('throws on invalid command character', () => {
-    expect(() => parseMultiCarInput(invalidCommandMultiInput)).toThrow(
-      'Invalid command character: X',
     );
   });
 });
