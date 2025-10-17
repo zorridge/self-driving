@@ -6,9 +6,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
-    "rootDir": ".",
-    "types": ["jest", "node"]
+    "rootDir": "src",
+    "types": ["node"]
   },
-  "include": ["src", "tests"],
-  "exclude": ["dist", "node_modules"]
+  "include": ["src"],
+  "exclude": ["dist", "node_modules", "tests"]
 }
