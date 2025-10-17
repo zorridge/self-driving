@@ -31,14 +31,17 @@ feature creep, prioritizing the core requirements.
 
 #### Suggested review approach
 
-- **Start with the `README`** <br/> For an overview of the design and key
-  assumptions.
-- **Review core modules** <br/> `entities` and `types` underpin the design and
-  structure of the implementation.
-- **Check test coverage** <br/> Test results below highlight which features and
-  edge cases are covered.
-- **Explore further** <br/> Feel free to run the CLI or examine additional
-  modules for more details.
+1. **Start with the `README`** <br/> For an overview of the design and key
+   assumptions.
+
+2. **Review core modules** <br/> `entities` and `types` underpin the design and
+   structure of the implementation.
+
+3. **Check test coverage** <br/> Test results below highlight which features and
+   edge cases are covered.
+
+4. **Explore further** <br/> Feel free to run the CLI or examine additional
+   modules for more details.
 
 ## 🚀 Get Started
 
