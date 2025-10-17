@@ -12,7 +12,12 @@ export function parseSingleCarInput(input: string): {
   field: Field;
   car: CarInput;
 } {
-  const lines = input.trim().split('\n');
+  const lines = input
+    .trim()
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
   if (lines.length < 3) {
     throw new Error(
       'Input must have at least 3 lines: field size, car position/direction, commands.',
@@ -36,7 +41,12 @@ export function parseMultiCarInput(input: string): {
   field: Field;
   cars: CarInput[];
 } {
-  const lines = input.trim().split('\n');
+  const lines = input
+    .trim()
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
   if (lines.length < 4) {
     throw new Error(
       'Input must have at least 4 lines for multi-car simulation.',
