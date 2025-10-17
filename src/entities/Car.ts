@@ -38,7 +38,7 @@ export class Car {
   executeCommand(cmd: Command, field: Field): void {
     if (cmd === Command.Left || cmd === Command.Right) {
       this._rotate(cmd);
-    } else if (cmd === Command.Forward) {
+    } else {
       const intended = this.getIntendedPosition(cmd, field);
       this.position = intended;
     }
@@ -50,7 +50,7 @@ export class Car {
 
     let step = 0;
     if (cmd === Command.Left) step = -1;
-    else if (cmd === Command.Right) step = 1;
+    else step = 1;
 
     this.direction =
       directions[(idx + step + directions.length) % directions.length];
