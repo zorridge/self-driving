@@ -5,20 +5,16 @@ export function simulateSingleCar(input: string): string {
   try {
     parsed = parseSingleCarInput(input);
   } catch (err) {
-    return `Input error: ${(err as Error).message}`;
+    return `Input error: ${(err as Error).stack}`;
   }
+
   const {
     field,
     car: { car, commands },
   } = parsed;
 
   for (const cmd of commands) {
-    if (cmd === 'L' || cmd === 'R') {
-      car.rotate(cmd as 'L' | 'R');
-    } else if (cmd === 'F') {
-      car.moveForward(field);
-    }
-    // Ignore invalid commands (should be caught by validation)
+    car.executeCommand(cmd, field);
   }
 
   return `${car.position.x} ${car.position.y} ${car.direction}`;

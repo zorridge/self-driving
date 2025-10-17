@@ -1,11 +1,11 @@
 import { Field } from '../entities/Field';
 import { Car } from '../entities/Car';
-import { Direction } from '../types';
+import { Command, Direction } from '../types';
 
 export interface CarInput {
   id: string;
   car: Car;
-  commands: string[];
+  commands: Command[];
 }
 
 export function parseSingleCarInput(input: string): {
@@ -20,7 +20,7 @@ export function parseSingleCarInput(input: string): {
     );
   }
 
-  // Validate field size
+  // Parse field size
   const [widthStr, heightStr] = lines[0].split(' ');
   const width = Number(widthStr);
   const height = Number(heightStr);
@@ -30,7 +30,7 @@ export function parseSingleCarInput(input: string): {
     );
   }
 
-  // Validate car position and direction
+  // Parse car position and direction
   const [xStr, yStr, dirStr] = lines[1].split(' ');
   const x = Number(xStr);
   const y = Number(yStr);
@@ -43,11 +43,9 @@ export function parseSingleCarInput(input: string): {
     throw new Error('Invalid car direction. Must be N, E, S, or W.');
   }
 
-  // Validate commands
-  const commands = lines[2].split('');
-  if (!commands.every((cmd) => ['L', 'R', 'F'].includes(cmd))) {
-    throw new Error('Commands must only contain L, R, or F.');
-  }
+  // Parse commands
+  const commands = parseCommands(lines[2]);
+  console.log(commands);
 
   return {
     field: new Field(width, height),
@@ -70,7 +68,7 @@ export function parseMultiCarInput(input: string): {
     );
   }
 
-  // Validate field size
+  // Parse field size
   const [widthStr, heightStr] = lines[0].split(' ');
   const width = Number(widthStr);
   const height = Number(heightStr);
@@ -89,7 +87,7 @@ export function parseMultiCarInput(input: string): {
 
     if (i + 2 >= lines.length) throw new Error('Incomplete car definition.');
 
-    // Validate car position and direction
+    // Parse car position and direction
     const [xStr, yStr, dirStr] = lines[i + 1].split(' ');
     const x = Number(xStr);
     const y = Number(yStr);
@@ -100,11 +98,8 @@ export function parseMultiCarInput(input: string): {
       throw new Error(`Invalid direction for car ${id}.`);
     }
 
-    // Validate commands
-    const commands = lines[i + 2].split('');
-    if (!commands.every((cmd) => ['L', 'R', 'F'].includes(cmd))) {
-      throw new Error(`Invalid commands for car ${id}.`);
-    }
+    // Parse commands
+    const commands = parseCommands(lines[i + 2]);
 
     cars.push({
       id,
@@ -131,4 +126,19 @@ export function parseMultiCarInput(input: string): {
     field: new Field(width, height),
     cars,
   };
+}
+
+function parseCommands(cmdStr: string): Command[] {
+  return cmdStr.split('').map((char) => {
+    switch (char) {
+      case 'L':
+        return Command.Left;
+      case 'R':
+        return Command.Right;
+      case 'F':
+        return Command.Forward;
+      default:
+        throw new Error(`Invalid command character: ${char}`);
+    }
+  });
 }
